@@ -82,6 +82,17 @@ namespace AplikacjaTestujaca
             StatystykiNaglowek.IsVisible = true;
             collectionViewStatystyki.IsVisible = true;
         }
+        async public void OnClearStateClicked(object sender, EventArgs e)
+        {            
+            var lista = new ObservableCollection<Statystyki>(await Database.GetStatystykiAsync());
+
+            foreach (var item in lista)
+            {
+               await Database.DeleteStatystykiAsync(item);
+            }
+
+            ListState();
+        }
         #endregion
 
         #region Picker
@@ -369,7 +380,7 @@ namespace AplikacjaTestujaca
             secondsElapsed = 0;
             TimerLabel.Text = $"Czas: {secondsElapsed} s";
             taskTimer.Start();
-            stopwatch.Start();
+            stopwatch.Restart();
 
             try
             {
@@ -414,7 +425,7 @@ namespace AplikacjaTestujaca
                     IloscWarunkow = _warunkiList.Count(),
                     CzasMax = Model.CzasMax,
                     CzasMin = _wynik.Count() - 1,
-                    CzasAnalizy = secondsElapsed
+                    CzasAnalizy = TimerLabel.Text
                 };
 
                 Database.AddStatystykiAsync(statystyki);

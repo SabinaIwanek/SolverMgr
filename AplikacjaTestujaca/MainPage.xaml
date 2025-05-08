@@ -9,6 +9,7 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem Clicked="OnFormClicked" Order="Primary" Text="Solver"/>
         <ToolbarItem Clicked="OnStateClicked" Order="Primary" Text="Statystyki"/>
+        <ToolbarItem Clicked="OnClearStateClicked" Order="Primary" Text="Wyczyść statystyki"/>
     </ContentPage.ToolbarItems>
 
     <StackLayout>
@@ -96,7 +97,8 @@
                             
                             <!--Lista warunków-->
                             <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,20,0,0">
-                                <CollectionView x:Name="collectionView" SelectionMode="Single" >
+                                <CollectionView x:Name="collectionView" SelectionMode="Single" HeightRequest="200" VerticalScrollBarVisibility="Always">
+                                    
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:Name="dataTemplateWarunki" x:DataType="model:WarunekModel">
                                             <Grid BackgroundColor="#F5F5F5">
