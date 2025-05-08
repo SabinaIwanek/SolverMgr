@@ -309,9 +309,34 @@ namespace AplikacjaTestujaca
                 {
                     using var stream = await fileResult.OpenReadAsync();
                     using var reader = new StreamReader(stream);
-                    string content = await reader.ReadToEndAsync();
+                    //string content = await reader.ReadToEndAsync();
 
-                    // Tutaj możesz zrobić coś z wczytanymi danymi
+                    _warunkiList = new ObservableCollection<WarunekModel>();
+
+                    string? line;
+                    while ((line = await reader.ReadLineAsync()) != null)
+                    {
+                        if (line.StartsWith("time")) 
+                            Model.CzasMax = Int32.Parse(line.Replace("time(1..", string.Empty).Replace(").", string.Empty));
+
+                        if(line.StartsWith("task"))
+                            Model.IloscZadan = Int32.Parse(line.Replace("task(1..", string.Empty).Replace(").", string.Empty));
+
+                        if (line.StartsWith("processor"))
+                            Model.IloscProcesorow = Int32.Parse(line.Replace("processor(1..", string.Empty).Replace(").", string.Empty));
+
+                        if (line.StartsWith("precedes"))
+                        {
+                            string dane = line.Replace("precedes(", string.Empty).Replace(").", string.Empty);
+                            string[] wartosci = dane.Split(",");
+
+                            if (wartosci.Count() != 2) throw new Exception($"Błędna linia w pliku: {line}.");
+
+                            _warunkiList.Add(new WarunekModel() { Poprzedzajace = Int32.Parse(wartosci[0]), Nastepujace = Int32.Parse(wartosci[1]) });
+                        }
+                    }
+
+                    OnAppearing();
                 }
             }
             catch (Exception ex)
@@ -350,8 +375,10 @@ namespace AplikacjaTestujaca
                     Model.IloscZadan,
                     Model.IloscProcesorow,
                     Model.CzasMax,
-                    _warunkiList.Select(x => (x.Poprzedzajace, x.Nastepujace)).ToList()
+                    _warunkiList.Select(x => (x.Poprzedzajace -1, x.Nastepujace -1)).ToList()
                 ));
+
+                //odejmuje ponieważ mój solver działa od 0, a tutaj jest od 1
 
                 _wynik = new ObservableCollection<WynikModel>(wynik);
 

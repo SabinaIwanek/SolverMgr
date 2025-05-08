@@ -114,8 +114,8 @@ namespace AplikacjaTestujaca.Controllers
             #endregion
 
             #region wywołanie solvera i wypisanie wyniku
-            
             // Solver
+
             Solver.ResultStatus status = model.Solve();
 
             List<(int z, int t)> lista = new List<(int z, int t)>();
@@ -145,7 +145,8 @@ namespace AplikacjaTestujaca.Controllers
 
             foreach (var item in grupy)
             {
-                wynik.Add(new WynikModel(item.Key, item.Select(x => x.z.ToString()).ToList(), $"T{++i}"));
+                //dodaje 1 bo solver działa od 0, ale wyniki prezentuje od 1
+                wynik.Add(new WynikModel(item.Key, item.Select(x => (x.z + 1).ToString()).ToList(), $"T{++i}"));
             }
 
             return wynik;
