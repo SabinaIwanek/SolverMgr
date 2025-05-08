@@ -287,6 +287,38 @@ namespace AplikacjaTestujaca
             delete = true;
             OnAppearing();
         }
+        async private void OnImportButtonClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                var customTextType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                    { DevicePlatform.Android, new[] { "text/plain" } },
+                    { DevicePlatform.iOS, new[] { "public.plain-text" } },
+                    { DevicePlatform.MacCatalyst, new[] { "public.plain-text" } },
+                    { DevicePlatform.WinUI, new[] { ".txt" } }
+                });
+
+                var fileResult = await FilePicker.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Wybierz plik tekstowy",
+                    FileTypes = customTextType
+                });
+
+                if (fileResult != null)
+                {
+                    using var stream = await fileResult.OpenReadAsync();
+                    using var reader = new StreamReader(stream);
+                    string content = await reader.ReadToEndAsync();
+
+                    // Tutaj możesz zrobić coś z wczytanymi danymi
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Błąd", $"{ex.Message}", "OK");
+            }
+        }
         async private void OnSolveButtonClicked(object sender, EventArgs e)
         {
             #region Sprawdzanie poprawności danych

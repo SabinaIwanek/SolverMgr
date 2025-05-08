@@ -1,5 +1,5 @@
 ﻿using AplikacjaTestujaca.Models;
-using Google.OrTools.Sat;
+using Google.OrTools.LinearSolver;
 
 namespace AplikacjaTestujaca.Controllers
 {
@@ -12,10 +12,10 @@ namespace AplikacjaTestujaca.Controllers
             int duration = 1;  // czas trwania zadania
 
             #region Definicja binarnych zmiennych decyzyjnych
-            CpModel model = new();
+            Solver model = Solver.CreateSolver("SCIP");
 
             // Deklaracja tablicy 3 wymiarowej, ponieważ harmonogram zawiera: zadania, procesory i czas startu
-            IntVar[,,] x = new IntVar[numTasks, m, D];
+            Variable[,,] x = new Variable[numTasks, m, D];
 
             for (int t = 0; t < numTasks; t++)
             {
@@ -24,7 +24,7 @@ namespace AplikacjaTestujaca.Controllers
                     for (int time = 0; time < D; time++)
                     {
                         // Zmienna x[t, p, time] = 1 jeśli zadanie t wykonywane na procesorze p w czasie time, jeśli nie to równa zero
-                        x[t, p, time] = model.NewBoolVar($"x_{t}_{p}_{time}"); //przypisujemy każdej unikalną nazwę
+                        x[t, p, time] = model.MakeBoolVar($"x_{t}_{p}_{time}"); //przypisujemy każdej unikalną nazwę
                     }
                 }
             }
@@ -34,13 +34,21 @@ namespace AplikacjaTestujaca.Controllers
             // Ograniczenie: Każde zadanie musi być wykonane dokładnie raz
             for (int t = 0; t < numTasks; t++)
             {
-                List<IntVar> occurences = new();
+                List<Variable> occurences = new();
                 for (int p = 0; p < m; p++)
                     for (int time = 0; time < D; time++)
                         occurences.Add(x[t, p, time]);
 
                 //occurences(zdarzenia) => wszystkie zmienne dot 1 zadania, poniżej warunek, że suma tej listy musi być =1
-                model.Add(LinearExpr.Sum(occurences) == 1);
+                //model.Add(LinearExpr.Sum(occurences) == 1);
+
+                //[DODANE]
+                LinearExpr sumExpr = occurences[0];
+                for (int s = 1; s < occurences.Count; s++)
+                {
+                    sumExpr += occurences[s];
+                }
+                model.Add(sumExpr == 1);
             }
 
             // Ograniczenie: Każdy procesor może robić jedno zadanie na raz
@@ -48,13 +56,21 @@ namespace AplikacjaTestujaca.Controllers
             {
                 for (int time = 0; time < D; time++)
                 {
-                    List<IntVar> simultaneous = new();
+                    List<Variable> simultaneous = new();
                     for (int t = 0; t < numTasks; t++)
                         simultaneous.Add(x[t, p, time]);
 
                     //simultaneous(jednoczesny) => wszystkie zmienne o tym zamym procesorze i czasie, poniżej warunek że suma nie może przekraczać 1
                     //czyli albo procesor w danym czasie jest zajęty albo wolny
-                    model.Add(LinearExpr.Sum(simultaneous) <= 1);
+                    //model.Add(LinearExpr.Sum(simultaneous) <= 1);
+
+                    //[DODANE]
+                    LinearExpr sumExpr = simultaneous[0];
+                    for (int s = 1; s < simultaneous.Count; s++)
+                    {
+                        sumExpr += simultaneous[s];
+                    }
+                    model.Add(sumExpr <= 1);
                 }
             }
             #endregion
@@ -62,7 +78,7 @@ namespace AplikacjaTestujaca.Controllers
             #region Ograniczenia dotyczące czasów
 
             // wpisanie do modelu wyznaczenia czasu startu dla każdego zadania
-            IntVar[] startTime = new IntVar[numTasks];
+            Variable[] startTime = new Variable[numTasks];
             for (int t = 0; t < numTasks; t++)
             {
                 //z funkcji otrzymujemy IntVar, która trzyma dokładny moment rozpoczęcia zadania.
@@ -85,7 +101,7 @@ namespace AplikacjaTestujaca.Controllers
 
             #region Minimalizacja w celu otrzymania najszybszej opcji
             // Zmienna celu - maksymalny czas zakończenia
-            IntVar finishTime = model.NewIntVar(0, D, "finish");
+            Variable finishTime = model.MakeIntVar(0, D, "finish");
 
             foreach (var s in startTime)
             {
@@ -98,24 +114,21 @@ namespace AplikacjaTestujaca.Controllers
             #endregion
 
             #region wywołanie solvera i wypisanie wyniku
+            
             // Solver
-            CpSolver solver = new();
-
-            int idealFinishTime = (int)Math.Ceiling((double)numTasks / m);
-            EarlyStoppingCallback callback = new(finishTime, idealFinishTime, solver);
-            CpSolverStatus status = solver.SolveWithSolutionCallback(model, callback);
+            Solver.ResultStatus status = model.Solve();
 
             List<(int z, int t)> lista = new List<(int z, int t)>();
 
             //Feasible jeśli próba znalezienia trwa za długo to daje poprawne rozwiązanie ale nie wie czy jest ono najlepsze
-            if (status == CpSolverStatus.Optimal || status == CpSolverStatus.Feasible)
+            if (status == Solver.ResultStatus.OPTIMAL || status == Solver.ResultStatus.FEASIBLE)
             {
                 //Console.WriteLine($"Rozwiązanie: finish = {solver.Value(finishTime)}");
                 for (int t = 0; t < numTasks; t++)
                 {
                     //wyciągamy z solwera wartości zmiennych zadeklarowanych do modelu
                     //Console.WriteLine($"Zadanie {t} startuje w czasie {solver.Value(startTime[t])}");
-                    lista.Add((t, (int)solver.Value(startTime[t])));
+                    lista.Add((t, (int)startTime[t].SolutionValue()));
                 }
             }
             else
@@ -139,9 +152,9 @@ namespace AplikacjaTestujaca.Controllers
         }
 
         // Funkcja pomocnicza, do wyznaczania czasu startu na podstawie binarnych zmiennych x[t,p,t]
-        static IntVar WeightedSum(CpModel model, IntVar[,,] x, int task, int numProc, int horizon)
+        static Variable WeightedSum(Solver model, Variable[,,] x, int task, int numProc, int horizon)
         {
-            List<IntVar> vars = new(); // lista zmiennych decyzyjnych dla danego task
+            List<Variable> vars = new(); // lista zmiennych decyzyjnych dla danego task
             List<int> coeffs = new(); // współczynniki czasowe (t) odpowiadające tym zmiennym
 
             for (int p = 0; p < numProc; p++)
@@ -153,13 +166,22 @@ namespace AplikacjaTestujaca.Controllers
                 }
             }
 
+            //[DODANE] // Budowanie wyrażenia: sum(t * x[task,p,t])
+            LinearExpr sumExpr = vars[0] * coeffs[0];
+            for (int i = 1; i < vars.Count; i++)
+            {
+                sumExpr += vars[i] * coeffs[i];
+            }
+
             //do modelu dodajemy zmienną przechowującą czas startowy zadania
-            IntVar start = model.NewIntVar(0, horizon - 1, $"start_{task}");
+            Variable start = model.MakeIntVar(0, horizon - 1, $"start_{task}");
 
             //korzystamy z skalarnego iloczynu dzięki któremu otrzymamy czas startowy 
             //czyli tylko jedna zmienna w vars będzie równa 1, reszta 0, 
             //czyli tam gdzie vars = 1, to my otrzymamy przypisany do niego coeffs
-            model.Add(start == LinearExpr.ScalProd(vars, coeffs));
+            //model.Add(start == LinearExpr.ScalProd(vars, coeffs));
+
+            model.Add(start == sumExpr);
 
             return start;
         }

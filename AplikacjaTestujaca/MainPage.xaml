@@ -73,6 +73,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
                                 <RowDefinition Height="7"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
@@ -88,8 +89,13 @@
                             <Label Grid.Row="2" Grid.Column="0" Text="Czas maksymalny" VerticalOptions="Center"/>
                             <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Model.CzasMax}"/>
 
+                            <!--Import-->
+                            <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" >
+                                <Button  x:Name="ImportButton" Text="Importuj plik" Clicked="OnImportButtonClicked"/>
+                            </Grid>
+                            
                             <!--Lista warunków-->
-                            <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,20,0,0">
+                            <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,20,0,0">
                                 <CollectionView x:Name="collectionView" SelectionMode="Single" >
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:Name="dataTemplateWarunki" x:DataType="model:WarunekModel">
@@ -118,10 +124,10 @@
                                 </CollectionView>
                             </Grid>
 
-                            <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Margin="0,3"/>
+                            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Margin="0,3"/>
 
                             <!--Dodaj warunek-->
-                            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" >
+                            <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" >
                                 <Grid BackgroundColor="#F5F5F5">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="70" />
@@ -145,7 +151,7 @@
                             </Grid>
 
                             <!--Solve-->
-                            <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" >
+                            <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" >
                                 <Button  x:Name="SolveButton" Text="Rozwiąż" Clicked="OnSolveButtonClicked"/>
                                 <ActivityIndicator x:Name="LoadingIndicator"
                                         IsRunning="True"
@@ -155,7 +161,7 @@
                             </Grid>
 
                             <!--Timer-->
-                            <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" >
+                            <Grid Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" >
                                 <HorizontalStackLayout>
                                     <Label x:Name="TimerLabel"
                                         FontSize="20"
