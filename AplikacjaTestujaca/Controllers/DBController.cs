@@ -38,11 +38,14 @@ namespace AplikacjaTestujaca.Controllers
         public Task<int> DeleteWarunekAsync(Warunek item) =>
             _database.DeleteAsync(item);
 
-        // CRUD dla Warunek
+        // CRUD dla Statystyki
         public Task<List<Statystyki>> GetStatystykiAsync() =>
             _database.Table<Statystyki>().ToListAsync();
 
         public Task<int> AddStatystykiAsync(Statystyki item) =>
             _database.InsertAsync(item);
+
+        public Task<int> DeleteStatystykiAsync(Statystyki item) =>
+            _database.DeleteAsync(item);
     }
 }

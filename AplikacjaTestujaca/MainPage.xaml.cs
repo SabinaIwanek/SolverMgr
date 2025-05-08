@@ -2,6 +2,7 @@
 using AplikacjaTestujaca.Database;
 using AplikacjaTestujaca.Models;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 using System.Timers;
 
@@ -18,6 +19,7 @@ namespace AplikacjaTestujaca
           "Przykład 1",
       };
 
+        private Stopwatch stopwatch = new Stopwatch();
         private System.Timers.Timer taskTimer;
         private int secondsElapsed = 0;
         public static DBController Database { get; private set; }
@@ -367,6 +369,7 @@ namespace AplikacjaTestujaca
             secondsElapsed = 0;
             TimerLabel.Text = $"Czas: {secondsElapsed} s";
             taskTimer.Start();
+            stopwatch.Start();
 
             try
             {
@@ -391,6 +394,16 @@ namespace AplikacjaTestujaca
             }
 
             taskTimer.Stop();
+            stopwatch.Stop();
+
+            #region stopwatch
+
+            TimeSpan elapsed = stopwatch.Elapsed;
+            int seconds = elapsed.Seconds;
+            int hundredths = elapsed.Milliseconds / 10;
+
+            TimerLabel.Text = $"Czas: {seconds}.{hundredths:D2} s";
+            #endregion
 
             if (!error)
             {
