@@ -1,0 +1,303 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:AplikacjaTestujaca.Models"
+             xmlns:model2="clr-namespace:AplikacjaTestujaca.Database"
+             x:Class="AplikacjaTestujaca.MainPage">
+
+    <!--Menu-->
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Clicked="OnFormClicked" Order="Primary" Text="Solver"/>
+        <ToolbarItem Clicked="OnStateClicked" Order="Primary" Text="Statystyki"/>
+    </ContentPage.ToolbarItems>
+
+    <StackLayout>
+        <ScrollView VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <StackLayout Margin="15">
+
+                <!--Obsługa bazy-->
+                <Grid x:Name="DaneBaza" BackgroundColor="#F5F5F5" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="80" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="2"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="Nazwa" HorizontalOptions ="Center" VerticalOptions="Center"/>
+                    <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryNazwa"/>
+                    <Grid Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2">
+                        <Button Text="Dodaj" Clicked="OnAddButtonClicked"/>
+                    </Grid>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Nazwa" VerticalOptions="Center" HorizontalOptions="Center"/>
+                    <Picker Grid.Row="1" Grid.Column="1" x:Name="CountryPicker" />
+                    <Grid Grid.Row="1" Grid.Column="2">
+                        <Button Text="Zapisz" Clicked="OnSaveButtonClicked"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Grid.Column="3">
+                        <Button Text="Usuń" Clicked="OnDeleteButtonClicked"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" BackgroundColor="Black"/>
+                </Grid>
+
+                <!--Panel rozwiazan-->
+                <Grid x:Name="Panel" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="230" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!--Obsługa danych-->
+                    <Grid Grid.Row="0" Grid.Column="0" x:Name="Dane">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="130" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="7"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Text="Ilość zadań" VerticalOptions="Center"/>
+                            <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Model.IloscZadan}"/>
+
+                            <Label Grid.Row="1" Grid.Column="0" Text="Ilość procesorów" VerticalOptions="Center"/>
+                            <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Model.IloscProcesorow}"/>
+
+                            <Label Grid.Row="2" Grid.Column="0" Text="Czas maksymalny" VerticalOptions="Center"/>
+                            <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Model.CzasMax}"/>
+
+                            <!--Lista warunków-->
+                            <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,20,0,0">
+                                <CollectionView x:Name="collectionView" SelectionMode="Single" >
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:Name="dataTemplateWarunki" x:DataType="model:WarunekModel">
+                                            <Grid BackgroundColor="#F5F5F5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70" />
+                                                    <ColumnDefinition Width="20" />
+                                                    <ColumnDefinition Width="70" />
+                                                    <ColumnDefinition Width="70" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Entry Grid.Row="0" Grid.Column="0" Text="{Binding Poprzedzajace}" HorizontalTextAlignment="End" IsReadOnly="true"/>
+                                                <Label Grid.Row="0" Grid.Column="1" Text="&lt;" FontAttributes="Bold" VerticalOptions="Center" HorizontalTextAlignment="Center"/>
+                                                <Entry Grid.Row="0" Grid.Column="2" Text="{Binding Nastepujace}" HorizontalTextAlignment="End" IsReadOnly="true"/>
+
+                                                <Grid Grid.Row="0" Grid.Column="3">
+                                                    <Button Text="X" Clicked="OnDeleteElemButtonClicked"/>
+                                                </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Grid>
+
+                            <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Margin="0,3"/>
+
+                            <!--Dodaj warunek-->
+                            <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" >
+                                <Grid BackgroundColor="#F5F5F5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="70" />
+                                        <ColumnDefinition Width="70" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Entry Grid.Row="0" Grid.Column="0" Text="{Binding Model.Poprzedzajace}" HorizontalTextAlignment="End"/>
+                                    <Label Grid.Row="0" Grid.Column="1" Text="&lt;"  VerticalOptions="Center"/>
+                                    <Entry Grid.Row="0" Grid.Column="2" Text="{Binding Model.Nastepujace}" HorizontalTextAlignment="End"/>
+
+                                    <Grid Grid.Row="0" Grid.Column="3">
+                                        <Button Text="Dodaj" Clicked="OnAddElemButtonClicked"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            <!--Solve-->
+                            <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" >
+                                <Button  x:Name="SolveButton" Text="Rozwiąż" Clicked="OnSolveButtonClicked"/>
+                                <ActivityIndicator x:Name="LoadingIndicator"
+                                        IsRunning="True"
+                                        IsVisible="False"
+                                        Color="{StaticResource Primary}"
+                                        HeightRequest="40" />
+                            </Grid>
+
+                            <!--Timer-->
+                            <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" >
+                                <HorizontalStackLayout>
+                                    <Label x:Name="TimerLabel"
+                                        FontSize="20"
+                                        Text="Czas: 0 s"
+                                        HorizontalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <!--Wyniki-->
+                    <Grid Grid.Row="0" Grid.Column="1" x:Name="Wyniki" Margin="20,0,0,0">
+
+                        <!--Lista wyników-->
+                        <Grid x:Name="Tabela" IsVisible="false">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="45"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Grid.Column="0">
+                                <Button Text="W lewo" Clicked="OnLeftButtonClicked" Margin="1,0"/>
+                            </Grid>
+                            <Grid Grid.Row="0" Grid.Column="1">
+                                <Button Text="W prawo" Clicked="OnRightButtonClicked" Margin="1,0"/>
+                            </Grid>
+
+                            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                                <CollectionView x:Name="collectionViewWyniki" IsVisible="False" Margin="0,10">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:Name="dataTemplateWyniki" x:DataType="model:WynikModel">
+                                            <Grid BackgroundColor="{Binding BGColor}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition Height="1"/>
+                                                </Grid.RowDefinitions>
+
+                                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding T}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" BackgroundColor="LightGray"/>
+                                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding W0}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="2" Text="{Binding W1}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="3" Text="{Binding W2}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="4" Text="{Binding W3}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="5" Text="{Binding W4}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="6" Text="{Binding W5}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="7" Text="{Binding W6}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="8" Text="{Binding W7}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="9" Text="{Binding W8}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                                <Label Grid.Row="0" Grid.Column="10" Text="{Binding W9}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+
+                                                <Label Grid.Row="1" Grid.ColumnSpan="11" BackgroundColor="Black"/>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Grid>
+                        </Grid>
+
+                    </Grid>
+
+                </Grid>
+
+                <!--Statystyki-->
+                <Grid x:Name="StatystykiNaglowek" BackgroundColor="{StaticResource Gray100}" IsVisible="False">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="1"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Grid.Column="0" Text="Ilosc Zadan" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" BackgroundColor="LightGray"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="Ilosc Procesorow" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="2" Text="Ilosc Warunkow" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="3" Text="Czas Max" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="4" Text="Czas Min" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="5" Text="Czas Analizy" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+
+                    <Label Grid.Row="1" Grid.ColumnSpan="11" BackgroundColor="Black"/>
+                </Grid>
+
+                <!--Statystyki lista-->
+                <CollectionView x:Name="collectionViewStatystyki" IsVisible="False" Margin="0,10">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:Name="dataTemplateStatystyki" x:DataType="model2:Statystyki">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="1"/>
+                                </Grid.RowDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding IloscZadan}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding IloscProcesorow}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                <Label Grid.Row="0" Grid.Column="2" Text="{Binding IloscWarunkow}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                <Label Grid.Row="0" Grid.Column="3" Text="{Binding CzasMax}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                <Label Grid.Row="0" Grid.Column="4" Text="{Binding CzasMin}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold"/>
+                                <Label Grid.Row="0" Grid.Column="5" Text="{Binding CzasAnalizy}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" BackgroundColor="LightGray"/>
+
+                                <Label Grid.Row="1" Grid.ColumnSpan="11" BackgroundColor="Black"/>
+
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </StackLayout>
+        </ScrollView>
+    </StackLayout>
+
+</ContentPage>
