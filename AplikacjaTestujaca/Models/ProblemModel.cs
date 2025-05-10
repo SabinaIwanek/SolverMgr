@@ -57,6 +57,19 @@ namespace AplikacjaTestujaca.Models
             }
         }
 
+        private string _czasDoPorownania;
+        public string CzasDoPorownania
+        {
+            get => _czasDoPorownania;
+            set
+            {
+                if (_czasDoPorownania == value) return;
+
+                _czasDoPorownania = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CzasDoPorownania"));
+            }
+        }
+
         private int _poprzedzajace;
         public int Poprzedzajace
         {

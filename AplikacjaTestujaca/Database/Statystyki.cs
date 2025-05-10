@@ -11,6 +11,8 @@ namespace AplikacjaTestujaca.Database
         public int IloscWarunkow { get; set; }
         public int CzasMax { get; set; }
         public int CzasMin { get; set; }
+        public string Nazwa { get; set; }
+        public string CzasAnalizyDoPorownania { get; set; }
         public string CzasAnalizy { get; set; }
     }
 }

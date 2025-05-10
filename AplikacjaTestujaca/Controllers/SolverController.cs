@@ -137,9 +137,9 @@ namespace AplikacjaTestujaca.Controllers
             }
             #endregion
 
-            var grupy = lista.GroupBy(x=>x.t).OrderBy(x=>x.Key);
+            var grupy = lista.GroupBy(x => x.t).OrderBy(x => x.Key);
 
-            wynik.Add(new WynikModel(-1, new List<string> {  "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20" }.ToList(),null));
+            wynik.Add(new WynikModel(-1, new List<string> { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20" }.ToList(), null));
 
             int i = 0;
 

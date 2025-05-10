@@ -425,6 +425,8 @@ namespace AplikacjaTestujaca
                     IloscWarunkow = _warunkiList.Count(),
                     CzasMax = Model.CzasMax,
                     CzasMin = _wynik.Count() - 1,
+                    Nazwa = Model.Nazwa,
+                    CzasAnalizyDoPorownania = Model.CzasDoPorownania,
                     CzasAnalizy = TimerLabel.Text
                 };
 
