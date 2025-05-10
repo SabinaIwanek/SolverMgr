@@ -110,6 +110,7 @@ namespace AplikacjaTestujaca
                 IloscZadan = model.IloscZadan,
                 IloscProcesorow = model.IloscProcesorow,
                 CzasMax = model.MaxCzas,
+                CzasDoPorownania = model.CzasDoPorownania,
             };
 
             var warunki = (await Database.GetWarunkiAsync())
