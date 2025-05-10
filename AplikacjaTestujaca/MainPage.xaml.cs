@@ -204,6 +204,7 @@ namespace AplikacjaTestujaca
                 IloscZadan = Model.IloscZadan,
                 IloscProcesorow = Model.IloscProcesorow,
                 MaxCzas = Model.CzasMax,
+                CzasDoPorownania = Model.CzasDoPorownania,
             };
 
             await Database.AddProblemAsync(model);
@@ -234,6 +235,7 @@ namespace AplikacjaTestujaca
                 IloscZadan = Model.IloscZadan,
                 IloscProcesorow = Model.IloscProcesorow,
                 MaxCzas = Model.CzasMax,
+                CzasDoPorownania = Model.CzasDoPorownania,
             };
 
             await Database.UpdateProblemAsync(model);
@@ -271,6 +273,7 @@ namespace AplikacjaTestujaca
                 IloscZadan = Model.IloscZadan,
                 IloscProcesorow = Model.IloscProcesorow,
                 MaxCzas = Model.CzasMax,
+                CzasDoPorownania = Model.CzasDoPorownania,
             };
 
             Database.DeleteProblemAsync(model);

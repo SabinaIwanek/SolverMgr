@@ -10,5 +10,6 @@ namespace AplikacjaTestujaca.Database
         public int IloscZadan { get; set; }
         public int IloscProcesorow { get; set; }
         public int MaxCzas { get; set; }
+        public string CzasDoPorownania { get; set; }
     }
 }
